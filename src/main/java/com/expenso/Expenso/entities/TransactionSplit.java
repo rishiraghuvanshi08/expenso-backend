@@ -40,6 +40,9 @@ public class TransactionSplit {
   @Column(name = "percentage_share")
   private BigDecimal percentageShare;
 
+  @Column(name = "share_count")
+  private Integer shareCount;
+
   @Column(name = "note")
   private String note;
 
