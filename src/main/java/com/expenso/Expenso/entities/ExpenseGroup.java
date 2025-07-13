@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +26,9 @@ public class ExpenseGroup {
 
   @Column(nullable = false, length = 100)
   private String name;
+
+  @Column(name = "budget_amount", nullable = true, precision = 10, scale = 2)
+  private BigDecimal budgetAmount;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "created_by_user_id", nullable = false)
