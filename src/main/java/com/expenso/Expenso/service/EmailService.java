@@ -1,0 +1,33 @@
+package com.expenso.Expenso.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class EmailService {
+
+  private final JavaMailSender mailSender;
+
+  public void sendOtpEmail(String toEmail, String otp) {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo(toEmail);
+    message.setSubject("Expenso - One-Time Password (OTP) for Registration");
+
+    message.setText(
+      "Dear User,\n\n" +
+        "Thank you for choosing Expenso.\n\n" +
+        "To complete your registration, please use the following One-Time Password (OTP):\n\n" +
+        otp + "\n\n" +
+        "Once you confirm the OTP, your account will be successfully registered in our system.\n" +
+        "You will then be able to log in and begin using our services.\n\n" +
+        "If you did not initiate this request, please ignore this email.\n\n" +
+        "Best regards,\n" +
+        "The Expenso Team"
+    );
+
+    mailSender.send(message);
+  }
+}
