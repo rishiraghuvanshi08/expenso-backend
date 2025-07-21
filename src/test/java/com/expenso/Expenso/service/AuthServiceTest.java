@@ -40,11 +40,7 @@ class AuthServiceTest {
 
   @Test
   void initiateRegistration_shouldSendOtp_whenEmailNotRegistered() {
-    RegisterRequest request = new RegisterRequest();
-    request.setName("John");
-    request.setEmail("john@example.com");
-    request.setPassword("password");
-    request.setPhoneNumber("1234567890");
+    RegisterRequest request = new RegisterRequest("John", "john@example.com", "password", "1234567890");
 
     when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
     when(tempUserStore.cacheUserRequest(request)).thenReturn("123456");
@@ -56,11 +52,7 @@ class AuthServiceTest {
 
   @Test
   void initiateRegistration_shouldThrow_whenEmailAlreadyExists() {
-    RegisterRequest request = new RegisterRequest();
-    request.setName("John");
-    request.setEmail("john@example.com");
-    request.setPassword("password");
-    request.setPhoneNumber("1234567890");
+    RegisterRequest request = new RegisterRequest("John", "john@example.com", "password", "1234567890");
 
     when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(mock(AppUser.class)));
 
@@ -76,11 +68,7 @@ class AuthServiceTest {
     String email = "john@example.com";
     String otp = "123456";
 
-    RegisterRequest request = new RegisterRequest();
-    request.setName("John");
-    request.setEmail(email);
-    request.setPassword("rawPass");
-    request.setPhoneNumber("1234567890");
+    RegisterRequest request = new RegisterRequest("John", email, "rawPass", "1234567890");
 
     when(tempUserStore.verifyOtp(email, otp)).thenReturn(true);
     when(tempUserStore.getRequest(email)).thenReturn(request);
@@ -112,9 +100,7 @@ class AuthServiceTest {
 
   @Test
   void login_shouldReturnAuthResponse_whenCredentialsAreValid() {
-    LoginRequest request = new LoginRequest();
-    request.setEmail("john@example.com");
-    request.setPassword("password");
+    LoginRequest request = new LoginRequest("john@example.com","password");
 
     AppUser user = AppUser.builder()
                           .id(1L)
@@ -134,9 +120,7 @@ class AuthServiceTest {
 
   @Test
   void login_shouldThrow_whenUserNotFound() {
-    LoginRequest request = new LoginRequest();
-    request.setEmail("unknown@example.com");
-    request.setPassword("pass");
+    LoginRequest request = new LoginRequest("unknown@example.com","pass");
 
     // Return a dummy Authentication token (required return type)
     Authentication dummyAuth = new UsernamePasswordAuthenticationToken(
