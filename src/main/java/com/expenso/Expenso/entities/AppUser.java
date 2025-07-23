@@ -46,6 +46,10 @@ public class AppUser {
   @CreationTimestamp
   private LocalDateTime createdAt;
 
+  @Builder.Default
+  @Column(name = "is_active", nullable = false)
+  private boolean isActive = true;
+
   @OneToMany(mappedBy = "appUser", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<UserTransaction> userTransactions;
 
