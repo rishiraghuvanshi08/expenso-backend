@@ -1,10 +1,6 @@
 package com.expenso.Expenso.exception;
 
-import com.expenso.Expenso.exception.custom.EmailAlreadyExistsException;
-import com.expenso.Expenso.exception.custom.InvalidOtpException;
-import com.expenso.Expenso.exception.custom.UserDisabledException;
-import com.expenso.Expenso.exception.custom.InvalidRequestException;
-import com.expenso.Expenso.exception.custom.ResourceNotFoundException;
+import com.expenso.Expenso.exception.custom.*;
 import com.expenso.Expenso.response.CustomResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,22 +32,22 @@ public class GlobalExceptionHandler {
                          .body(new CustomResponseMessage(false, ex.getMessage()));
   }
 
+  @ExceptionHandler(UserAlreadyDeactivatedException.class)
+  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(UserAlreadyDeactivatedException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
   @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex, WebRequest request) {
-    return new ResponseEntity<>(Map.of(
-      "timestamp", LocalDateTime.now(),
-      "message", ex.getMessage(),
-      "status", HttpStatus.NOT_FOUND.value()
-    ), HttpStatus.NOT_FOUND);
+  public ResponseEntity<CustomResponseMessage> handleResourceNotFound(ResourceNotFoundException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
   }
 
   @ExceptionHandler(InvalidRequestException.class)
-  public ResponseEntity<?> handleInvalidRequest(InvalidRequestException ex, WebRequest request) {
-    return new ResponseEntity<>(Map.of(
-      "timestamp", LocalDateTime.now(),
-      "message", ex.getMessage(),
-      "status", HttpStatus.BAD_REQUEST.value()
-    ), HttpStatus.BAD_REQUEST);
+  public ResponseEntity<CustomResponseMessage> handleInvalidRequest(InvalidRequestException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
   }
 
   @ExceptionHandler(Exception.class)

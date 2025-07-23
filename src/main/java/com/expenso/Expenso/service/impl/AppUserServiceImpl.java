@@ -7,6 +7,7 @@ import com.expenso.Expenso.dto.appuser.PasswordChangeDTO;
 import com.expenso.Expenso.entities.AppUser;
 import com.expenso.Expenso.exception.custom.InvalidRequestException;
 import com.expenso.Expenso.exception.custom.ResourceNotFoundException;
+import com.expenso.Expenso.exception.custom.UserAlreadyDeactivatedException;
 import com.expenso.Expenso.repository.AppUserRepository;
 import com.expenso.Expenso.service.AppUserService;
 import jakarta.transaction.Transactional;
@@ -45,6 +46,15 @@ public class AppUserServiceImpl implements AppUserService {
   @Transactional
   public void deactivateUser(Long id) {
     AppUser user = findUserOrThrow(id);
+
+    // If already deactivated, optionally throw or just return
+    if (!user.isActive()) {
+      throw new UserAlreadyDeactivatedException(AppUserResponseMessage.USER_ALREADY_DEACTIVATED.getMessage());
+    }
+
+    // Mark user as inactive
+    user.setActive(false);
+
     user.setEmail(user.getEmail() + ".deactivated." + System.currentTimeMillis()); // Mask email
     user.setPassword("deactivated");
     appUserRepository.save(user);
