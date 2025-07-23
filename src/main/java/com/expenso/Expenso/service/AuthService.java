@@ -6,6 +6,7 @@ import com.expenso.Expenso.dto.RegisterRequest;
 import com.expenso.Expenso.entities.AppUser;
 import com.expenso.Expenso.exception.custom.EmailAlreadyExistsException;
 import com.expenso.Expenso.exception.custom.InvalidOtpException;
+import com.expenso.Expenso.exception.custom.UserDisabledException;
 import com.expenso.Expenso.repository.AppUserRepository;
 import com.expenso.Expenso.security.JwtService;
 import com.expenso.Expenso.service.redis.TempUserStore;
@@ -62,6 +63,10 @@ public class AuthService {
 
     AppUser user = userRepository.findByEmail(request.getEmail())
                                  .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+    if (!user.isActive()) {
+      throw new UserDisabledException("User account is deactivated");
+    }
 
     String token = jwtService.generateToken(user.getEmail());
 

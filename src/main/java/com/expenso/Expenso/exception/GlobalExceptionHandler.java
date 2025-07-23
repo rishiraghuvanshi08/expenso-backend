@@ -2,6 +2,7 @@ package com.expenso.Expenso.exception;
 
 import com.expenso.Expenso.exception.custom.EmailAlreadyExistsException;
 import com.expenso.Expenso.exception.custom.InvalidOtpException;
+import com.expenso.Expenso.exception.custom.UserDisabledException;
 import com.expenso.Expenso.response.CustomResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,12 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(InvalidOtpException.class)
   public ResponseEntity<CustomResponseMessage> handleInvalidOtp(InvalidOtpException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
+  @ExceptionHandler(UserDisabledException.class)
+  public ResponseEntity<CustomResponseMessage> handleUserDisabled(UserDisabledException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                          .body(new CustomResponseMessage(false, ex.getMessage()));
   }
