@@ -1,7 +1,7 @@
 package com.expenso.Expenso.entities;
 
-import com.expenso.Expenso.entities.enums.CategoryScope;
-import com.expenso.Expenso.entities.enums.CategoryType;
+import com.expenso.Expenso.enums.entity.CategoryScope;
+import com.expenso.Expenso.enums.entity.CategoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

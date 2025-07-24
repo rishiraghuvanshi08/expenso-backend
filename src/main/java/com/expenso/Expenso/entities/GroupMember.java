@@ -1,7 +1,7 @@
 package com.expenso.Expenso.entities;
 
-import com.expenso.Expenso.entities.enums.GroupMemberRole;
-import com.expenso.Expenso.entities.enums.GroupMemberStatus;
+import com.expenso.Expenso.enums.entity.GroupMemberRole;
+import com.expenso.Expenso.enums.entity.GroupMemberStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

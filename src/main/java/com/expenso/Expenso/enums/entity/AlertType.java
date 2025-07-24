@@ -1,4 +1,4 @@
-package com.expenso.Expenso.entities.enums;
+package com.expenso.Expenso.enums.entity;
 
 public enum AlertType {
   BUDGET_THRESHOLD,

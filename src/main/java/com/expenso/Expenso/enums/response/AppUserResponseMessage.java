@@ -1,4 +1,4 @@
-package com.expenso.Expenso.constants.response;
+package com.expenso.Expenso.enums.response;
 
 public enum AppUserResponseMessage {
 

@@ -1,4 +1,4 @@
-package com.expenso.Expenso.dto;
+package com.expenso.Expenso.dto.auth;
 
 import lombok.Data;
 

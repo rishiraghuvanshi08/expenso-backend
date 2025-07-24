@@ -2,7 +2,7 @@ package com.expenso.Expenso.entities;
 
 import com.expenso.Expenso.entities.embedded.AlertResult;
 import com.expenso.Expenso.entities.embedded.converter.AlertResultConverter;
-import com.expenso.Expenso.entities.enums.ScheduledAlertStatus;
+import com.expenso.Expenso.enums.entity.ScheduledAlertStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
