@@ -1,7 +1,7 @@
 package com.expenso.Expenso.entities;
 
-import com.expenso.Expenso.entities.enums.SettlementMethod;
-import com.expenso.Expenso.entities.enums.SettlementStatus;
+import com.expenso.Expenso.enums.entity.SettlementMethod;
+import com.expenso.Expenso.enums.entity.SettlementStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

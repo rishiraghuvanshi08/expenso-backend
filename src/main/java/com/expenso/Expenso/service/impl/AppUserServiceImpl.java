@@ -1,6 +1,6 @@
 package com.expenso.Expenso.service.impl;
 
-import com.expenso.Expenso.constants.response.AppUserResponseMessage;
+import com.expenso.Expenso.enums.response.AppUserResponseMessage;
 import com.expenso.Expenso.dto.appuser.AppUserResponseDTO;
 import com.expenso.Expenso.dto.appuser.AppUserUpdateDTO;
 import com.expenso.Expenso.dto.appuser.PasswordChangeDTO;

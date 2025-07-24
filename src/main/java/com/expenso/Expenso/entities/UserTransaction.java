@@ -1,6 +1,6 @@
 package com.expenso.Expenso.entities;
 
-import com.expenso.Expenso.entities.enums.TransactionType;
+import com.expenso.Expenso.enums.entity.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package com.expenso.Expenso.entities;
 
-import com.expenso.Expenso.entities.enums.NotificationChannelType;
+import com.expenso.Expenso.enums.entity.NotificationChannelType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

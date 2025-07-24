@@ -1,11 +1,15 @@
 package com.expenso.Expenso.service;
 
-import com.expenso.Expenso.dto.*;
+import com.expenso.Expenso.dto.auth.AuthResponse;
+import com.expenso.Expenso.dto.auth.LoginRequest;
+import com.expenso.Expenso.dto.auth.RegisterRequest;
 import com.expenso.Expenso.entities.AppUser;
 import com.expenso.Expenso.exception.custom.EmailAlreadyExistsException;
 import com.expenso.Expenso.exception.custom.InvalidOtpException;
 import com.expenso.Expenso.repository.AppUserRepository;
 import com.expenso.Expenso.security.JwtService;
+import com.expenso.Expenso.service.impl.AuthServiceImpl;
+import com.expenso.Expenso.service.impl.EmailServiceImpl;
 import com.expenso.Expenso.service.redis.TempUserStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,9 +31,9 @@ class AuthServiceTest {
   @Mock private PasswordEncoder passwordEncoder;
   @Mock private JwtService jwtService;
   @Mock private AuthenticationManager authManager;
-  @Mock private EmailService emailService;
+  @Mock private EmailServiceImpl emailService;
 
-  @InjectMocks private AuthService authService;
+  @InjectMocks private AuthServiceImpl authService;
 
   @BeforeEach
   void setUp() {
@@ -100,7 +104,7 @@ class AuthServiceTest {
 
   @Test
   void login_shouldReturnAuthResponse_whenCredentialsAreValid() {
-    LoginRequest request = new LoginRequest("john@example.com","password");
+    LoginRequest request = new LoginRequest("john@example.com", "password");
 
     AppUser user = AppUser.builder()
                           .id(1L)

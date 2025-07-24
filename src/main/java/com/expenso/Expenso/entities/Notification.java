@@ -3,7 +3,7 @@ package com.expenso.Expenso.entities;
 import com.expenso.Expenso.entities.embedded.NotificationMetadata;
 import com.expenso.Expenso.entities.embedded.converter.DeliveryChannelConverter;
 import com.expenso.Expenso.entities.embedded.converter.NotificationMetadataConverter;
-import com.expenso.Expenso.entities.enums.NotificationType;
+import com.expenso.Expenso.enums.entity.NotificationType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,11 +1,10 @@
 package com.expenso.Expenso.service.redis;
 
-import com.expenso.Expenso.dto.RegisterRequest;
+import com.expenso.Expenso.dto.auth.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.util.Random;
 

@@ -1,7 +1,7 @@
 package com.expenso.Expenso.entities;
 
-import com.expenso.Expenso.entities.enums.NotificationPreferencesNotify;
-import com.expenso.Expenso.entities.enums.NotificationType;
+import com.expenso.Expenso.enums.entity.NotificationPreferencesNotify;
+import com.expenso.Expenso.enums.entity.NotificationType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
