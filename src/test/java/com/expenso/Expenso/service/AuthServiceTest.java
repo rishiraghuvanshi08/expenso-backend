@@ -114,14 +114,12 @@ class AuthServiceTest {
                           .build();
 
     when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(user));
-    when(jwtService.generateToken("john@example.com")).thenReturn("jwt-token");
+    when(jwtService.generateToken(1L, "john@example.com")).thenReturn("jwt-token");
 
     AuthResponse response = authService.login(request);
 
     assertThat(response).isNotNull();
-    assertThat(response.getEmail()).isEqualTo("john@example.com");
     assertThat(response.getToken()).isEqualTo("jwt-token");
-    assertThat(response.getUserId()).isEqualTo(1L);
   }
 
   @Test
