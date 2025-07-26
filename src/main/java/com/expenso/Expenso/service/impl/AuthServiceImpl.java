@@ -77,11 +77,9 @@ public class AuthServiceImpl implements AuthService {
       throw new UserDisabledException(AuthResponseMessage.USER_DISABLED.getMessage());
     }
 
-    String token = jwtService.generateToken(user.getEmail());
+    String token = jwtService.generateToken(user.getId(), user.getEmail());
 
     return AuthResponse.builder()
-                       .userId(user.getId())
-                       .email(user.getEmail())
                        .token(token)
                        .build();
   }
