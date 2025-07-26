@@ -19,26 +19,24 @@ public class AppUserController {
 
   private final AppUserService appUserService;
 
-  @GetMapping("/{id}")
-  public ResponseEntity<CustomResponse<AppUserResponseDTO>> getUser(@PathVariable Long id) {
-    return ResponseEntity.ok(new CustomResponse<AppUserResponseDTO>(true, AppUserResponseMessage.USER_FETCH_SUCCESS.getMessage(), appUserService.getUserById(id)));
+  @GetMapping
+  public ResponseEntity<CustomResponse<AppUserResponseDTO>> getUser(@RequestAttribute("userId") Long userId) {
+    return ResponseEntity.ok(new CustomResponse<AppUserResponseDTO>(true, AppUserResponseMessage.USER_FETCH_SUCCESS.getMessage(), appUserService.getUserById(userId)));
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<CustomResponse<AppUserResponseDTO>> updateUser(@PathVariable Long id,
-                                                       @Valid @RequestBody AppUserUpdateDTO dto) {
-    return ResponseEntity.ok(new CustomResponse<AppUserResponseDTO>(true, AppUserResponseMessage.USER_UPDATE_SUCCESS.getMessage(), appUserService.updateUser(id, dto)));
+  @PutMapping
+  public ResponseEntity<CustomResponse<AppUserResponseDTO>> updateUser(@RequestAttribute("userId") Long userId, @Valid @RequestBody AppUserUpdateDTO dto) {
+    return ResponseEntity.ok(new CustomResponse<AppUserResponseDTO>(true, AppUserResponseMessage.USER_UPDATE_SUCCESS.getMessage(), appUserService.updateUser(userId, dto)));
   }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<CustomResponseMessage> deactivateUser(@PathVariable Long id) {
-    appUserService.deactivateUser(id);
+  @DeleteMapping
+  public ResponseEntity<CustomResponseMessage> deactivateUser(@RequestAttribute("userId") Long userId) {
+    appUserService.deactivateUser(userId);
     return ResponseEntity.ok(new CustomResponseMessage(true, AppUserResponseMessage.USER_DEACTIVATION_SUCCESS.getMessage()));
   }
 
-  @PutMapping("/{userId}/change-password")
-  public ResponseEntity<CustomResponseMessage> changePassword(@PathVariable Long userId,
-                                             @Valid @RequestBody PasswordChangeDTO dto) {
+  @PutMapping("/change-password")
+  public ResponseEntity<CustomResponseMessage> changePassword(@RequestAttribute("userId") Long userId, @Valid @RequestBody PasswordChangeDTO dto) {
     appUserService.changePassword(userId, dto);
     return ResponseEntity.ok(new CustomResponseMessage(true, AppUserResponseMessage.PASSWORD_CHANGE_SUCCESS.getMessage()));
   }
