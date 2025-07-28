@@ -1,9 +1,7 @@
 package com.expenso.Expenso.service;
 
-import com.expenso.Expenso.dto.usertransaction.TransactionStatsDTO;
-import com.expenso.Expenso.dto.usertransaction.TransactionSummaryDTO;
-import com.expenso.Expenso.dto.usertransaction.UserTransactionRequestDTO;
-import com.expenso.Expenso.dto.usertransaction.UserTransactionResponseDTO;
+import com.expenso.Expenso.dto.usertransaction.*;
+import com.expenso.Expenso.enums.request.TransactionGroupBy;
 
 import java.util.List;
 
@@ -11,13 +9,13 @@ public interface UserTransactionService {
 
   UserTransactionResponseDTO createTransaction(Long userId, UserTransactionRequestDTO dto);
 
-  UserTransactionResponseDTO updateTransaction(Long userId, Long id, UserTransactionRequestDTO dto);
+  UserTransactionResponseDTO updateTransaction(Long userId, Long transactionId, UserTransactionUpdateDTO dto);
 
-  void deleteTransaction(Long userId, Long id);
+  void deleteTransaction(Long userId, Long transactionId);
 
   List<UserTransactionResponseDTO> getAllTransactions(Long userId);
 
-  List<TransactionSummaryDTO> getSummary(Long userId, String groupBy);
+  List<TransactionSummaryDTO> getSummary(Long userId, TransactionGroupBy groupBy);
 
   TransactionStatsDTO getStats(Long userId);
 }

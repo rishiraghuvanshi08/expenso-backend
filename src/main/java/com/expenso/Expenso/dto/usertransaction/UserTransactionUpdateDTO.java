@@ -1,25 +1,15 @@
 package com.expenso.Expenso.dto.usertransaction;
 
-import com.expenso.Expenso.enums.entity.TransactionType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-public class UserTransactionRequestDTO {
-
-  @NotNull
-  private BigDecimal amount;
+public class UserTransactionUpdateDTO {
 
   @NotNull
   private Long categoryId;
-
-  private Long walletId;
-
-  @NotNull
-  private TransactionType transactionType;
 
   private String note;
 
