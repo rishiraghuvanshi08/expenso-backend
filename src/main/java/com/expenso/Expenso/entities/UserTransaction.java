@@ -32,8 +32,8 @@ public class UserTransaction {
   @JoinColumn(name = "category_id", nullable = false)
   private Category category;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "wallet_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @JoinColumn(name = "wallet_id", nullable = true)
   private Wallet wallet;
 
   @Column(nullable = false, precision = 10, scale = 2)
