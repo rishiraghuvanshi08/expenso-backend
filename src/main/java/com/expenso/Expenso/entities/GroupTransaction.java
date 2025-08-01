@@ -17,7 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupTransaction {
+public class  GroupTransaction {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
