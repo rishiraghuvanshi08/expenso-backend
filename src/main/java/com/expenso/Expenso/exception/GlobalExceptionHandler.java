@@ -38,6 +38,36 @@ public class GlobalExceptionHandler {
                          .body(new CustomResponseMessage(false, ex.getMessage()));
   }
 
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(AccessDeniedException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
+  @ExceptionHandler(DeletionFailedException.class)
+  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(DeletionFailedException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
+  @ExceptionHandler(InvalidCombinationException.class)
+  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(InvalidCombinationException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
+  @ExceptionHandler(UpdationFailedException.class)
+  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(UpdationFailedException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
+  @ExceptionHandler(ResourceAlreadyExistsException.class)
+  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(ResourceAlreadyExistsException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<CustomResponseMessage> handleResourceNotFound(ResourceNotFoundException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)

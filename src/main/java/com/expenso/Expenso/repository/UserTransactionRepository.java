@@ -75,4 +75,10 @@ public interface UserTransactionRepository extends JpaRepository<UserTransaction
            "GROUP BY FUNCTION('YEAR', t.date), FUNCTION('MONTH', t.date) " +
            "ORDER BY FUNCTION('YEAR', t.date), FUNCTION('MONTH', t.date)")
   List<Object[]> getMonthlyStats(@Param("userId") Long userId);
+
+  boolean existsByCategoryIdAndIsDeletedFalse(Long categoryId);
+
+  boolean existsByCategoryId(Long categoryId);
+
+  List<UserTransaction> findByAppUserIdAndCategoryIdAndIsDeletedFalse(Long userId, Long categoryId);
 }
