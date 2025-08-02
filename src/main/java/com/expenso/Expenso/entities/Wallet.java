@@ -1,5 +1,6 @@
 package com.expenso.Expenso.entities;
 
+import com.expenso.Expenso.enums.entity.WalletStatus;
 import com.expenso.Expenso.enums.entity.WalletType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -39,6 +40,10 @@ public class Wallet {
   @Column(nullable = false, precision = 10, scale = 2)
   @NotNull
   private BigDecimal balance;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false, length = 20)
+  private WalletStatus status = WalletStatus.ACTIVE;
 
   @OneToMany(mappedBy = "wallet", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<UserTransaction> transactions;

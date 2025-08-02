@@ -81,4 +81,14 @@ public interface UserTransactionRepository extends JpaRepository<UserTransaction
   boolean existsByCategoryId(Long categoryId);
 
   List<UserTransaction> findByAppUserIdAndCategoryIdAndIsDeletedFalse(Long userId, Long categoryId);
+
+  @Query("""
+      SELECT ut FROM UserTransaction ut
+      WHERE ut.wallet.id = :walletId
+      AND ut.wallet.status = 'ACTIVE'
+      AND ut.wallet.appUser.id = :userId
+      AND ut.wallet.appUser.isActive = true
+      ORDER BY ut.date DESC
+  """)
+  List<UserTransaction> findActiveTransactionsByWalletAndUser(@Param("walletId") Long walletId, @Param("userId") Long userId);
 }
