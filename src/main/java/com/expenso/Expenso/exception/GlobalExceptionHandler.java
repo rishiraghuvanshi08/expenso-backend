@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import java.lang.IllegalArgumentException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -77,6 +78,18 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(InvalidRequestException.class)
   public ResponseEntity<CustomResponseMessage> handleInvalidRequest(InvalidRequestException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<CustomResponseMessage> handleInvalidRequest(IllegalArgumentException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  }
+
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<CustomResponseMessage> handleInvalidRequest(IllegalStateException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
                          .body(new CustomResponseMessage(false, ex.getMessage()));
   }
 

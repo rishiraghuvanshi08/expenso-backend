@@ -1,6 +1,6 @@
 package com.expenso.Expenso.service.impl;
 
-import com.expenso.Expenso.dto.budget.BudgetDTO;
+import com.expenso.Expenso.dto.category.CategoryBudgetInfoDTO;
 import com.expenso.Expenso.dto.category.CategoryDetailResponseDTO;
 import com.expenso.Expenso.dto.category.CategoryResponseDTO;
 import com.expenso.Expenso.dto.category.CreateCategoryRequestDTO;
@@ -300,8 +300,8 @@ public class CategoryServiceImpl implements CategoryService {
                                      .build();
   }
 
-  private BudgetDTO mapToBudgetDTO(Budget budget) {
-    return new BudgetDTO(
+  private CategoryBudgetInfoDTO mapToBudgetDTO(Budget budget) {
+    return new CategoryBudgetInfoDTO(
       budget.getId(),
       budget.getAmount(),
       budget.getStartDate(),

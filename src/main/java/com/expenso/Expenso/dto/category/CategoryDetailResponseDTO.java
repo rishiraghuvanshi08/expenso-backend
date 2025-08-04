@@ -1,6 +1,5 @@
 package com.expenso.Expenso.dto.category;
 
-import com.expenso.Expenso.dto.budget.BudgetDTO;
 import com.expenso.Expenso.dto.grouptransaction.GroupTransactionDTO;
 import com.expenso.Expenso.dto.usertransaction.UserTransactionResponseDTO;
 import com.expenso.Expenso.enums.entity.CategoryScope;
@@ -22,5 +21,5 @@ public class CategoryDetailResponseDTO {
 
   private List<UserTransactionResponseDTO> userTransactions;
   private List<GroupTransactionDTO> groupTransactions;
-  private List<BudgetDTO> budgets;
+  private List<CategoryBudgetInfoDTO> budgets;
 }
