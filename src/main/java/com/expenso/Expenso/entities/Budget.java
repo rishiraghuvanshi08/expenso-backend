@@ -1,5 +1,6 @@
 package com.expenso.Expenso.entities;
 
+import com.expenso.Expenso.enums.entity.BudgetStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -46,4 +47,7 @@ public class Budget {
   @Column(name = "is_active", nullable = false)
   private boolean active = true;
 
+  @Column(name = "status", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private BudgetStatus status;
 }

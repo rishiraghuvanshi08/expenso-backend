@@ -1,11 +1,16 @@
 package com.expenso.Expenso.repository;
 
 import com.expenso.Expenso.dto.usertransaction.TransactionSummaryDTO;
+import com.expenso.Expenso.entities.AppUser;
+import com.expenso.Expenso.entities.Category;
 import com.expenso.Expenso.entities.UserTransaction;
+import com.expenso.Expenso.enums.entity.TransactionType;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,4 +96,26 @@ public interface UserTransactionRepository extends JpaRepository<UserTransaction
       ORDER BY ut.date DESC
   """)
   List<UserTransaction> findActiveTransactionsByWalletAndUser(@Param("walletId") Long walletId, @Param("userId") Long userId);
+
+  @Query("SELECT SUM(t.amount) FROM UserTransaction t WHERE t.appUser.id = :userId AND t.category.id = :categoryId AND t.date BETWEEN :start AND :end")
+  Optional<BigDecimal> sumAmountByUserIdAndCategoryIdAndDateBetween(@Param("userId") Long userId,
+                                                                    @Param("categoryId") Long categoryId,
+                                                                    @Param("start") LocalDate start,
+                                                                    @Param("end") LocalDate end
+  );
+
+  @Query("""
+      SELECT SUM(t.amount)
+      FROM UserTransaction t
+      WHERE t.appUser.id = :userId
+        AND t.category.id = :categoryId
+        AND t.date BETWEEN :start AND :end
+        AND t.transactionType = :type
+        AND t.isDeleted = false
+  """)
+  BigDecimal sumAmountByUserAndCategoryAndDateRange(@Param("user") Long userId,
+                                                    @Param("category") Long categoryId,
+                                                    @Param("start") LocalDate start,
+                                                    @Param("end") LocalDate end,
+                                                    @Param("type") TransactionType type);
 }
