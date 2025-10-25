@@ -18,4 +18,8 @@ public interface UserTransactionService {
   List<TransactionSummaryDTO> getSummary(Long userId, TransactionGroupBy groupBy);
 
   TransactionStatsDTO getStats(Long userId);
+
+  List<UserTransactionResponseDTO> getTransactionsByCategory(Long userId, Long categoryId);
+
+  List<UserTransactionResponseDTO> getTransactionsByBudget(Long userId, Long budgetId);
 }

@@ -1,21 +1,12 @@
 package com.expenso.Expenso.service.impl;
 
 import com.expenso.Expenso.dto.usertransaction.*;
-import com.expenso.Expenso.entities.AppUser;
-import com.expenso.Expenso.entities.Category;
-import com.expenso.Expenso.entities.UserTransaction;
-import com.expenso.Expenso.entities.Wallet;
+import com.expenso.Expenso.entities.*;
 import com.expenso.Expenso.enums.entity.TransactionType;
 import com.expenso.Expenso.enums.request.TransactionGroupBy;
-import com.expenso.Expenso.enums.response.AppUserResponseMessage;
-import com.expenso.Expenso.enums.response.CategoryResponseMessage;
-import com.expenso.Expenso.enums.response.UserTransactionResponseMessage;
-import com.expenso.Expenso.enums.response.WalletResponseMessage;
+import com.expenso.Expenso.enums.response.*;
 import com.expenso.Expenso.exception.custom.ResourceNotFoundException;
-import com.expenso.Expenso.repository.AppUserRepository;
-import com.expenso.Expenso.repository.CategoryRepository;
-import com.expenso.Expenso.repository.UserTransactionRepository;
-import com.expenso.Expenso.repository.WalletRepository;
+import com.expenso.Expenso.repository.*;
 import com.expenso.Expenso.service.UserTransactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +31,7 @@ public class UserTransactionServiceImpl implements UserTransactionService {
   private final CategoryRepository categoryRepository;
   private final WalletRepository walletRepository;
   private final AppUserRepository appUserRepository;
+  private final BudgetRepository budgetRepository;
 
   @Override
   public UserTransactionResponseDTO createTransaction(Long userId, UserTransactionRequestDTO dto) {
@@ -158,6 +150,31 @@ public class UserTransactionServiceImpl implements UserTransactionService {
                               .netBalance(totalIncome.subtract(totalExpense))
                               .monthlyTotals(monthly)
                               .build();
+  }
+
+  @Override
+  public List<UserTransactionResponseDTO> getTransactionsByCategory(Long userId, Long categoryId) {
+    return userTransactionRepository.findByAppUserIdAndCategoryIdAndIsDeletedFalse(userId, categoryId)
+                                    .stream()
+                                    .map(this::mapToResponse)
+                                    .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<UserTransactionResponseDTO> getTransactionsByBudget(Long userId, Long budgetId) {
+    Budget budget = budgetRepository.findByIdAndAppUserId(budgetId, userId)
+                                    .orElseThrow(() -> new ResourceNotFoundException(BudgetResponseMessage.BUDGET_NOT_FOUND.getMessage()));
+
+    return userTransactionRepository
+             .findByAppUserIdAndCategoryIdAndDateBetweenAndIsDeletedFalse(
+               userId,
+               budget.getCategory().getId(),
+               budget.getStartDate(),
+               budget.getEndDate()
+             )
+             .stream()
+             .map(this::mapToResponse)
+             .collect(Collectors.toList());
   }
 
   private BigDecimal toBigDecimal(Object obj) {

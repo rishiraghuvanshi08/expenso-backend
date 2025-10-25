@@ -118,4 +118,7 @@ public interface UserTransactionRepository extends JpaRepository<UserTransaction
                                                     @Param("start") LocalDate start,
                                                     @Param("end") LocalDate end,
                                                     @Param("type") TransactionType type);
+
+  List<UserTransaction> findByAppUserIdAndCategoryIdAndDateBetweenAndIsDeletedFalse(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate);
+
 }

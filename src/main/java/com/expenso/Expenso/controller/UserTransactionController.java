@@ -51,4 +51,15 @@ public class UserTransactionController {
   public ResponseEntity<CustomResponse<TransactionStatsDTO>> stats(@RequestAttribute("userId") Long userId) {
     return ResponseEntity.ok(new CustomResponse<TransactionStatsDTO>(true, UserTransactionResponseMessage.TRANSACTION_STATS_FETCH_SUCCESS.getMessage(), transactionService.getStats(userId)));
   }
+
+  @GetMapping("/category/{categoryId}")
+  public ResponseEntity<CustomResponse<List<UserTransactionResponseDTO>>> getTransactionsByCategory(@RequestAttribute("userId") Long userId, @PathVariable Long categoryId) {
+    return ResponseEntity.ok(new CustomResponse<>(true, UserTransactionResponseMessage.TRANSACTION_FETCH_SUCCESS.getMessage(), transactionService.getTransactionsByCategory(userId, categoryId)));
+  }
+
+  @GetMapping("/budget/{budgetId}")
+  public ResponseEntity<CustomResponse<List<UserTransactionResponseDTO>>> getTransactionsByBudget(@RequestAttribute("userId") Long userId, @PathVariable Long budgetId) {
+    return ResponseEntity.ok(new CustomResponse<>(true, UserTransactionResponseMessage.TRANSACTION_FETCH_SUCCESS.getMessage(), transactionService.getTransactionsByBudget(userId, budgetId)));
+  }
+
 }

@@ -42,9 +42,14 @@ services:
       MYSQL_DATABASE: expenso
       MYSQL_ROOT_PASSWORD: root
     ports:
-      - "4307:3306" # <-- Exposes MySQL inside container on 3306, maps to 3307 on host
+      - "4307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 volumes:
   redis_data:

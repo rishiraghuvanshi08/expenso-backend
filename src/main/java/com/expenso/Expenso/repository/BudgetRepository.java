@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
 
@@ -27,4 +28,6 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
            "WHERE b.appUser.id = :userId AND b.category.id = :categoryId " +
            "AND (b.startDate <= :endDate AND b.endDate >= :startDate)")
   boolean existsOverlappingBudgetForNew(Long userId, Long categoryId, LocalDate startDate, LocalDate endDate);
+
+  Optional<Budget> findByIdAndAppUserId(Long budgetId, Long userId);
 }
