@@ -3,6 +3,11 @@ package com.expenso.Expenso.response;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Generic response wrapper for API responses that include data.
+ *
+ * @param <T> the type of the response data
+ */
 @Getter
 @Setter
 public class CustomResponse<T> {

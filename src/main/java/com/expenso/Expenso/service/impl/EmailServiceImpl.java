@@ -6,12 +6,18 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementation of {@link EmailService}.
+ */
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
   private final JavaMailSender mailSender;
 
+  /**
+   * @see EmailService#sendOtpEmail(String, String)
+   */
   public void sendOtpEmail(String toEmail, String otp) {
     SimpleMailMessage message = new SimpleMailMessage();
     message.setTo(toEmail);

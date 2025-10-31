@@ -22,6 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Implementation of {@link AuthService}.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -33,6 +36,9 @@ public class AuthServiceImpl implements AuthService {
   private final AuthenticationManager authManager;
   private final EmailServiceImpl emailService;
 
+  /**
+   * @see AuthService#initiateRegistration(RegisterRequest) 
+   */
   @Override
   @Transactional
   public void initiateRegistration(RegisterRequest request) {
@@ -44,6 +50,9 @@ public class AuthServiceImpl implements AuthService {
     emailService.sendOtpEmail(request.getEmail(), otp);
   }
 
+  /**
+   * @see AuthService#completeRegistration(String, String)
+   */
   @Override
   @Transactional
   public void completeRegistration(String email, String otp) {
@@ -64,6 +73,9 @@ public class AuthServiceImpl implements AuthService {
     tempUserStore.clear(email); // Remove from Redis
   }
 
+  /**
+   * @see AuthService#login(LoginRequest)
+   */
   @Override
   @Transactional
   public AuthResponse login(LoginRequest request) {

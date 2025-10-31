@@ -10,13 +10,20 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Scheduled task that updates the status of all budgets daily at midnight (IST).
+ */
 @Component
 @RequiredArgsConstructor
 public class BudgetStatusScheduler {
 
   private final BudgetRepository budgetRepository;
 
-  @Scheduled(cron = "0 30 18 * * *") // Runs every day at 12:00 AM IST (i.e., 6:30 PM UTC)
+  /**
+   * Updates budget statuses based on their start and end dates.
+   * Runs every day at 12:00 AM IST (6:30 PM UTC).
+   */
+  @Scheduled(cron = "0 30 18 * * *")
   public void updateBudgetStatuses() {
     LocalDate today = LocalDate.now();
 

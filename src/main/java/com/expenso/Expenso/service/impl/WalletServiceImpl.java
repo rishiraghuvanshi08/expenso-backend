@@ -26,6 +26,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of {@link WalletService}.
+ */
 @Service
 @RequiredArgsConstructor
 public class WalletServiceImpl implements WalletService {
@@ -34,6 +37,9 @@ public class WalletServiceImpl implements WalletService {
   private final AppUserRepository appUserRepository;
   private final UserTransactionRepository userTransactionRepository;
 
+  /**
+   * @see WalletService#getAllWalletsForUser(Long)
+   */
   @Override
   public List<WalletResponseDTO> getAllWalletsForUser(Long userId) {
     return walletRepository.findAllByAppUserIdAndStatus(userId, WalletStatus.ACTIVE).stream()
@@ -41,6 +47,9 @@ public class WalletServiceImpl implements WalletService {
                            .collect(Collectors.toList());
   }
 
+  /**
+   * @see WalletService#createWallet(Long, WalletRequestDTO)
+   */
   @Override
   @Transactional
   public WalletResponseDTO createWallet(Long userId, WalletRequestDTO dto) {
@@ -59,6 +68,9 @@ public class WalletServiceImpl implements WalletService {
     return mapToDTO(walletRepository.save(wallet));
   }
 
+  /**
+   * @see WalletService#updateWallet(Long, Long, WalletUpdateDTO)
+   */
   @Override
   @Transactional
   public WalletResponseDTO updateWallet(Long userId, Long walletId, WalletUpdateDTO dto) {
@@ -71,6 +83,9 @@ public class WalletServiceImpl implements WalletService {
     return mapToDTO(walletRepository.save(wallet));
   }
 
+  /**
+   * @see WalletService#deleteWallet(Long, Long)
+   */
   @Override
   @Transactional
   public void deleteWallet(Long userId, Long walletId) {
@@ -84,11 +99,17 @@ public class WalletServiceImpl implements WalletService {
     walletRepository.save(wallet);
   }
 
+  /**
+   * @see WalletService#getTotalBalance(Long)
+   */
   @Override
   public BigDecimal getTotalBalance(Long userId) {
     return walletRepository.findTotalBalanceByUserId(userId);
   }
 
+  /**
+   * @see WalletService#getWalletDetailsWithTransactions(Long, Long)
+   */
   @Override
   public WalletDetailsResponseDTO getWalletDetailsWithTransactions(Long userId, Long walletId) {
     Wallet wallet = getValidatedWallet(walletId, userId);
@@ -101,11 +122,28 @@ public class WalletServiceImpl implements WalletService {
     return mapToWalletResponseDTO(wallet, transactionDTOs);
   }
 
+  /**
+   * Validates and retrieves an active wallet for a given user.
+   *
+   * @param walletId ID of the wallet to validate.
+   * @param userId   ID of the wallet owner.
+   * @return The validated {@link Wallet} entity.
+   * @throws ResourceNotFoundException if wallet does not exist or is inactive.
+   */
   private Wallet getValidatedWallet(Long walletId, Long userId){
     return walletRepository.findActiveWalletForActiveUser(walletId, userId)
                            .orElseThrow(() -> new ResourceNotFoundException(WalletResponseMessage.WALLET_NOT_FOUND.getMessage()));
   }
 
+  /**
+   * Ensures that the user does not already have an active wallet
+   *
+   * @param userId          ID of the wallet owner.
+   * @param name            Wallet name to validate.
+   * @param type            Wallet type to validate.
+   * @param excludeWalletId Optional wallet ID to exclude (used in update scenarios).
+   * @throws InvalidRequestException if a duplicate wallet exists.
+   */
   private void validateUniqueWalletNameAndType(Long userId, String name, WalletType type, Long excludeWalletId) {
     boolean exists = walletRepository.existsActiveWalletByNameAndTypeExcludingId(userId, name, type, excludeWalletId);
     if (exists) {
@@ -113,6 +151,13 @@ public class WalletServiceImpl implements WalletService {
     }
   }
 
+  /**
+   * Converts a {@link Wallet} entity and its associated transactions into a {@link WalletDetailsResponseDTO}.
+   *
+   * @param wallet          The wallet entity to convert.
+   * @param transactionDTOs List of transaction DTOs linked to the wallet.
+   * @return A {@link WalletDetailsResponseDTO} containing wallet info and transaction details.
+   */
   private WalletDetailsResponseDTO mapToWalletResponseDTO(Wallet wallet, List<UserTransactionResponseDTO> transactionDTOs){
     return WalletDetailsResponseDTO.builder()
                                    .walletId(wallet.getId())
@@ -123,6 +168,12 @@ public class WalletServiceImpl implements WalletService {
                                    .build();
   }
 
+  /**
+   * Maps a list of {@link UserTransaction} entities to a list of {@link UserTransactionResponseDTO} objects for API responses.
+   *
+   * @param transactions List of {@link UserTransaction} entities.
+   * @return List of mapped {@link UserTransactionResponseDTO} objects.
+   */
   private List<UserTransactionResponseDTO> mapToListUserTransactionResponseDTO(List<UserTransaction> transactions){
     return transactions.stream()
                        .map(tx -> UserTransactionResponseDTO.builder()
@@ -137,6 +188,12 @@ public class WalletServiceImpl implements WalletService {
                        .collect(Collectors.toList());
   }
 
+  /**
+   * Maps a {@link Wallet} entity to a lightweight {@link WalletResponseDTO}
+   *
+   * @param wallet The wallet entity to map.
+   * @return Mapped {@link WalletResponseDTO} containing wallet summary info.
+   */
   private WalletResponseDTO mapToDTO(Wallet wallet) {
     return WalletResponseDTO.builder()
                             .walletId(wallet.getId())

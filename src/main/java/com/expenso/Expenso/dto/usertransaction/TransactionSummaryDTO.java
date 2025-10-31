@@ -1,6 +1,7 @@
 package com.expenso.Expenso.dto.usertransaction;
 
 import com.expenso.Expenso.enums.request.TransactionGroupBy;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,11 +16,22 @@ import java.util.Locale;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Aggregated summary of transactions grouped by category, date, or wallet.")
 public class TransactionSummaryDTO {
+
+  @Schema(description = "Grouping type for the summary (e.g., CATEGORY, DATE, WALLET).", example = "CATEGORY")
   private TransactionGroupBy groupBy; // category/date/wallet
+
+  @Schema(description = "Label representing the grouping value (e.g., 'Food', 'October 2025').", example = "Food & Dining")
   private String label;
+
+  @Schema(description = "Total income for the group.", example = "5000.00")
   private BigDecimal incomeTotal;
+
+  @Schema(description = "Total expense for the group.", example = "3200.00")
   private BigDecimal expenseTotal;
+
+  @Schema(description = "Net balance calculated as income minus expense.", example = "1800.00")
   private BigDecimal balance;
 
   // Constructor for YEAR or DATE
