@@ -3,6 +3,9 @@ package com.expenso.Expenso.response;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Standard response wrapper for API messages without data payload.
+ */
 @Getter
 @Setter
 public class CustomResponseMessage {

@@ -22,6 +22,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of {@link UserTransactionService}
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -33,6 +36,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
   private final AppUserRepository appUserRepository;
   private final BudgetRepository budgetRepository;
 
+  /**
+   * @see UserTransactionService#createTransaction(Long, UserTransactionRequestDTO)
+   */
   @Override
   public UserTransactionResponseDTO createTransaction(Long userId, UserTransactionRequestDTO dto) {
     AppUser user = findUserOrThrow(userId);
@@ -65,6 +71,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
     return mapToResponse(tx);
   }
 
+  /**
+   * @see UserTransactionService#updateTransaction(Long, Long, UserTransactionUpdateDTO)
+   */
   @Override
   public UserTransactionResponseDTO updateTransaction(Long userId, Long transactionId, UserTransactionUpdateDTO dto) {
     UserTransaction tx = userTransactionRepository.findByIdAndAppUserIdAndIsDeletedFalse(transactionId, userId)
@@ -78,6 +87,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
     return mapToResponse(userTransactionRepository.save(tx));
   }
 
+  /**
+   * @see UserTransactionService#deleteTransaction(Long, Long)
+   */
   @Override
   public void deleteTransaction(Long userId, Long transactionId) {
     UserTransaction tx = userTransactionRepository.findByIdAndAppUserIdAndIsDeletedFalse(transactionId, userId)
@@ -102,6 +114,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
     userTransactionRepository.save(tx);
   }
 
+  /**
+   * @see UserTransactionService#getAllTransactions(Long)
+   */
   @Override
   public List<UserTransactionResponseDTO> getAllTransactions(Long userId) {
     return userTransactionRepository.findByAppUserIdAndIsDeletedFalse(userId)
@@ -110,6 +125,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
                                     .collect(Collectors.toList());
   }
 
+  /**
+   * @see UserTransactionService#getSummary(Long, TransactionGroupBy)
+   */
   @Override
   public List<TransactionSummaryDTO> getSummary(Long userId, TransactionGroupBy groupBy) {
     return switch (groupBy) {
@@ -121,6 +139,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
     };
   }
 
+  /**
+   * @see UserTransactionService#getStats(Long)
+   */
   @Override
   public TransactionStatsDTO getStats(Long userId) {
     List<Object[]> results = userTransactionRepository.getMonthlyStats(userId);
@@ -152,6 +173,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
                               .build();
   }
 
+  /**
+   * @see UserTransactionService#getTransactionsByCategory(Long, Long)
+   */
   @Override
   public List<UserTransactionResponseDTO> getTransactionsByCategory(Long userId, Long categoryId) {
     return userTransactionRepository.findByAppUserIdAndCategoryIdAndIsDeletedFalse(userId, categoryId)
@@ -160,6 +184,9 @@ public class UserTransactionServiceImpl implements UserTransactionService {
                                     .collect(Collectors.toList());
   }
 
+  /**
+   * @see UserTransactionService#getTransactionsByBudget(Long, Long)
+   */
   @Override
   public List<UserTransactionResponseDTO> getTransactionsByBudget(Long userId, Long budgetId) {
     Budget budget = budgetRepository.findByIdAndAppUserId(budgetId, userId)
@@ -177,6 +204,13 @@ public class UserTransactionServiceImpl implements UserTransactionService {
              .collect(Collectors.toList());
   }
 
+  /**
+   * Converts various numeric result objects to {@link BigDecimal}.
+   * Used when processing aggregate queries (e.g., monthly stats).
+   *
+   * @param obj Object representing a numeric value.
+   * @return Equivalent {@link BigDecimal} value, or zero if null/unrecognized.
+   */
   private BigDecimal toBigDecimal(Object obj) {
     if (obj instanceof BigDecimal) return (BigDecimal) obj;
     if (obj instanceof Integer) return BigDecimal.valueOf((Integer) obj);
@@ -186,20 +220,48 @@ public class UserTransactionServiceImpl implements UserTransactionService {
     return BigDecimal.ZERO;
   }
 
+  /**
+   * Fetches an active user by ID or throws an exception if not found.
+   *
+   * @param id ID of the user.
+   * @return Found {@link AppUser} entity.
+   * @throws ResourceNotFoundException if user is not found.
+   */
   private AppUser findUserOrThrow(Long id) {
     return appUserRepository.findById(id)
                             .orElseThrow(() -> new ResourceNotFoundException(AppUserResponseMessage.USER_NOT_FOUND.getMessage()));
   }
 
+  /**
+   * Fetches a category by ID or throws an exception if not found.
+   *
+   * @param categoryId ID of the category.
+   * @return Found {@link Category} entity.
+   * @throws ResourceNotFoundException if category is not found.
+   */
   private Category findCategoryOrThrow(Long categoryId){
     return categoryRepository.findById(categoryId)
                             .orElseThrow(() -> new ResourceNotFoundException((CategoryResponseMessage.CATEGORY_NOT_FOUND.getMessage())));
   }
 
+  /**
+   * Fetches a wallet by ID or throws an exception if not found.
+   *
+   * @param walletId ID of the wallet.
+   * @return Found {@link Wallet} entity.
+   * @throws ResourceNotFoundException if wallet is not found.
+   */
   private Wallet findWalletOrThrow(Long walletId){
     return walletRepository.findById(walletId).orElseThrow(() -> new ResourceNotFoundException(WalletResponseMessage.WALLET_NOT_FOUND.getMessage()));
   }
 
+  /**
+   * Maps a {@link UserTransaction} entity to a {@link UserTransactionResponseDTO}.
+   * Includes essential details such as category, wallet, amount, and transaction date.
+   *
+   * @param tx Transaction entity to map.
+   * @return Mapped {@link UserTransactionResponseDTO}.
+   */
   private UserTransactionResponseDTO mapToResponse(UserTransaction tx) {
     return UserTransactionResponseDTO.builder()
                                      .id(tx.getId())

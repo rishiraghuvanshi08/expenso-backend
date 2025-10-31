@@ -28,6 +28,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of {@link BudgetService}
+ */
 @Service
 @RequiredArgsConstructor
 public class BudgetServiceImpl implements BudgetService {
@@ -37,6 +40,9 @@ public class BudgetServiceImpl implements BudgetService {
   private final CategoryRepository categoryRepository;
   private final UserTransactionRepository transactionRepository;
 
+  /**
+   * @see BudgetService#getAllBudgets(Long)
+   */
   @Override
   public List<BudgetResponseDTO> getAllBudgets(Long userId) {
     AppUser user = getUser(userId);
@@ -45,6 +51,9 @@ public class BudgetServiceImpl implements BudgetService {
                            .collect(Collectors.toList());
   }
 
+  /**
+   * @see BudgetService#createBudget(Long, BudgetRequestDTO)
+   */
   @Override
   @Transactional
   public BudgetResponseDTO createBudget(Long userId, BudgetRequestDTO dto) {
@@ -73,6 +82,9 @@ public class BudgetServiceImpl implements BudgetService {
     return mapToBudgetResponseDTO(budget);
   }
 
+  /**
+   * @see BudgetService#updateBudget(Long, Long, BudgetRequestDTO)
+   */
   @Override
   @Transactional
   public BudgetResponseDTO updateBudget(Long userId, Long budgetId, BudgetRequestDTO dto) {
@@ -108,12 +120,18 @@ public class BudgetServiceImpl implements BudgetService {
     return mapToBudgetResponseDTO(budget);
   }
 
+  /**
+   * @see BudgetService#deleteBudget(Long, Long)
+   */
   @Override
   public void deleteBudget(Long userId, Long budgetId) {
     Budget budget = getBudget(budgetId, userId);
     budgetRepository.delete(budget);
   }
 
+  /**
+   * @see BudgetService#getBudgetAnalytics(Long)
+   */
   @Override
   public List<BudgetAnalyticsDTO> getBudgetAnalytics(Long userId) {
     AppUser user = getUser(userId);
@@ -138,22 +156,52 @@ public class BudgetServiceImpl implements BudgetService {
                            }).collect(Collectors.toList());
   }
 
+  /**
+   * Retrieves and validates a budget belonging to a specific user.
+   *
+   * @param budgetId ID of the budget to retrieve.
+   * @param userId   ID of the user who owns the budget.
+   * @return The validated {@link Budget} entity.
+   * @throws ResourceNotFoundException if the budget does not exist or does not belong to the user.
+   */
   private Budget getBudget(Long budgetId, Long userId) {
     return budgetRepository.findById(budgetId)
                            .filter(b -> b.getAppUser().getId().equals(userId))
                            .orElseThrow(() -> new ResourceNotFoundException(BudgetResponseMessage.BUDGET_NOT_FOUND.getMessage()));
   }
 
+  /**
+   * Retrieves and validates an existing user by ID.
+   *
+   * @param userId ID of the user to retrieve.
+   * @return The validated {@link AppUser} entity.
+   * @throws ResourceNotFoundException if the user does not exist.
+   */
   private AppUser getUser(Long userId) {
     return appUserRepository.findById(userId)
                             .orElseThrow(() -> new ResourceNotFoundException(AppUserResponseMessage.USER_NOT_FOUND.getMessage()));
   }
 
+  /**
+   * Retrieves and validates a category by ID.
+   *
+   * @param categoryId ID of the category to retrieve.
+   * @return The validated {@link Category} entity.
+   * @throws ResourceNotFoundException if the category does not exist.
+   */
   private Category getCategory(Long categoryId) {
     return categoryRepository.findById(categoryId)
                              .orElseThrow(() -> new ResourceNotFoundException(CategoryResponseMessage.CATEGORY_NOT_FOUND.getMessage()));
   }
 
+  /**
+   * Validates category details for budget creation or update.
+   *
+   * @param dto    The {@link BudgetRequestDTO} containing category details.
+   * @param userId ID of the user creating/updating the budget.
+   * @return The validated {@link Category} entity.
+   * @throws IllegalArgumentException if any validation fails.
+   */
   private Category validateCategory(BudgetRequestDTO dto, Long userId){
     Category category = getCategory(dto.getCategoryId());
     // Check EXPENSE category
@@ -171,6 +219,12 @@ public class BudgetServiceImpl implements BudgetService {
     return category;
   }
 
+  /**
+   * Validates the details of a {@link BudgetRequestDTO} object.
+   *
+   * @param dto The budget request DTO to validate.
+   * @throws IllegalArgumentException if any validation rule fails.
+   */
   private void validateDtoDetails(BudgetRequestDTO dto){
     if (dto.getAmount() == null || dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
       throw new IllegalArgumentException(BudgetResponseMessage.INVALID_BUDGET_AMOUNT.getMessage());
@@ -185,6 +239,12 @@ public class BudgetServiceImpl implements BudgetService {
     }
   }
 
+  /**
+   * Updates the active status and budget status based on current date
+   * relative to the budget's start and end dates.
+   *
+   * @param budget The {@link Budget} entity to update.
+   */
   private void updateActiveStatus(Budget budget) {
     LocalDate today = LocalDate.now();
 
@@ -200,6 +260,12 @@ public class BudgetServiceImpl implements BudgetService {
     }
   }
 
+  /**
+   * Determines the current status of a given budget based on today's date.
+   *
+   * @param budget The {@link Budget} entity.
+   * @return The determined {@link BudgetStatus}.
+   */
   private BudgetStatus getStatus(Budget budget) {
     LocalDate today = LocalDate.now();
     if (today.isBefore(budget.getStartDate())) return BudgetStatus.UPCOMING;
@@ -207,6 +273,13 @@ public class BudgetServiceImpl implements BudgetService {
     return BudgetStatus.ACTIVE;
   }
 
+  /**
+   * Maps a {@link Budget} entity to a {@link BudgetResponseDTO}, calculating
+   * total spent amount and remaining balance for the defined period.
+   *
+   * @param budget The budget entity to map.
+   * @return A populated {@link BudgetResponseDTO} with calculated fields.
+   */
   private BudgetResponseDTO mapToBudgetResponseDTO(Budget budget) {
     BigDecimal spent = transactionRepository
                          .sumAmountByUserIdAndCategoryIdAndDateBetween(

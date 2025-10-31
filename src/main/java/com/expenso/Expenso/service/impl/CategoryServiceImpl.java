@@ -23,6 +23,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of {@link CategoryService}.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,6 +38,9 @@ public class CategoryServiceImpl implements CategoryService {
   private final GroupTransactionRepository groupTransactionRepository;
   private final BudgetRepository budgetRepository;
 
+  /**
+   * @see CategoryService#getCategoryDetails(Long, Long)
+   */
   @Override
   public CategoryDetailResponseDTO getCategoryDetails(Long categoryId, Long userId) {
     Category category = findCategoryOrThrow(categoryId);
@@ -60,7 +66,9 @@ public class CategoryServiceImpl implements CategoryService {
     return mapToCategoryDetailDTO(category, userTransactions, groupTransactions, budgets);
   }
 
-
+  /**
+   * @see CategoryService#getDefaultPersonalCategories()
+   */
   @Override
   public List<CategoryResponseDTO> getDefaultPersonalCategories() {
     return categoryRepository.findDefaultPersonalCategories()
@@ -68,6 +76,9 @@ public class CategoryServiceImpl implements CategoryService {
                              .collect(Collectors.toList());
   }
 
+  /**
+   * @see CategoryService#getUserCreatedPersonalCategories(Long) 
+   */
   @Override
   public List<CategoryResponseDTO> getUserCreatedPersonalCategories(Long userId) {
     return categoryRepository.findUserCreatedPersonalCategories(userId)
@@ -75,6 +86,9 @@ public class CategoryServiceImpl implements CategoryService {
                              .collect(Collectors.toList());
   }
 
+  /**
+   * @see CategoryService#getDefaultGroupCategories() 
+   */
   @Override
   public List<CategoryResponseDTO> getDefaultGroupCategories() {
     return categoryRepository.findDefaultGroupCategories()
@@ -82,6 +96,9 @@ public class CategoryServiceImpl implements CategoryService {
                              .collect(Collectors.toList());
   }
 
+  /**
+   * @see CategoryService#getUserCreatedGroupCategories(Long) 
+   */
   @Override
   public List<CategoryResponseDTO> getUserCreatedGroupCategories(Long groupId) {
     return categoryRepository.findUserCreatedGroupCategories(groupId)
@@ -89,6 +106,9 @@ public class CategoryServiceImpl implements CategoryService {
                              .collect(Collectors.toList());
   }
 
+  /**
+   * @see CategoryService#getAllVisibleCategories(Long) 
+   */
   @Override
   public List<CategoryResponseDTO> getAllVisibleCategories(Long userId) {
     AppUser user = findUserOrThrow(userId);
@@ -101,6 +121,9 @@ public class CategoryServiceImpl implements CategoryService {
                              .collect(Collectors.toList());
   }
 
+  /**
+   * @see CategoryService#getMergedGroupCategories(Long) 
+   */
   @Override
   public List<CategoryResponseDTO> getMergedGroupCategories(Long groupId) {
     return categoryRepository.findMergedGroupCategories(groupId)
@@ -108,6 +131,9 @@ public class CategoryServiceImpl implements CategoryService {
                              .collect(Collectors.toList());
   }
 
+  /**
+   * @see CategoryService#createPersonalCategory(Long, CreateCategoryRequestDTO) 
+   */
   @Override
   public CategoryResponseDTO createPersonalCategory(Long userId, CreateCategoryRequestDTO dto) {
     AppUser user = findUserOrThrow(userId);
@@ -125,6 +151,9 @@ public class CategoryServiceImpl implements CategoryService {
     return mapToDTO(categoryRepository.save(category));
   }
 
+  /**
+   * @see CategoryService#createGroupCategory(Long, Long, CreateCategoryRequestDTO) 
+   */
   @Override
   public CategoryResponseDTO createGroupCategory(Long groupId, Long userId, CreateCategoryRequestDTO dto) {
     AppUser user = findUserOrThrow(userId);
@@ -146,6 +175,9 @@ public class CategoryServiceImpl implements CategoryService {
     return mapToDTO(categoryRepository.save(category));
   }
 
+  /**
+   * @see CategoryService#updateCategory(Long, Long, UpdateCategoryRequestDTO) 
+   */
   @Override
   public CategoryResponseDTO updateCategory(Long categoryId, Long userId, UpdateCategoryRequestDTO dto) {
     Category category = findCategoryOrThrow(categoryId);
@@ -176,6 +208,9 @@ public class CategoryServiceImpl implements CategoryService {
     return mapToDTO(categoryRepository.save(category));
   }
 
+  /**
+   * @see CategoryService#deleteCategory(Long, Long) 
+   */
   @Override
   public void deleteCategory(Long categoryId, Long userId) {
     Category category = findCategoryOrThrow(categoryId);
@@ -183,6 +218,13 @@ public class CategoryServiceImpl implements CategoryService {
     categoryRepository.delete(category);
   }
 
+  /**
+   * Validates access permissions for a personal category
+   *
+   * @param category The personal category being accessed.
+   * @param userId   ID of the requesting user.
+   * @throws AccessDeniedException
+   */
   private void handlePersonalCategoryAccess(Category category, Long userId) {
     AppUser owner = category.getAppUser();
     if (owner != null && !owner.getId().equals(userId)) {
@@ -190,6 +232,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
   }
 
+  /**
+   * Handles access validation for group-scoped categories and fetches
+   * associated group transactions for the requesting user.
+   *
+   * @param category   The group category being accessed.
+   * @param userId     ID of the requesting user.
+   * @param categoryId ID of the category.
+   * @return List of group transactions associated with the user and category.
+   * @throws AccessDeniedException if the user is not a member of the group.
+   */
   private List<GroupTransaction> handleGroupCategoryAccessAndFetch(Category category, Long userId, Long categoryId) {
     ExpenseGroup group = category.getExpenseGroup();
 
@@ -207,16 +259,43 @@ public class CategoryServiceImpl implements CategoryService {
     return groupTransactionRepository.findByExpenseGroupIdAndPaidByUserIdAndCategoryId(group.getId(), userId, categoryId);
   }
 
+  /**
+   * Throws a standardized access denied exception used across category operations.
+   *
+   * @throws AccessDeniedException with a predefined category visibility message.
+   */
   private void throwAccessDeniedException(){
     throw new AccessDeniedException(CategoryResponseMessage.CATEGORY_VISIBILITY_RESTRICTED.getMessage());
   }
 
+  /**
+   * Validates that a category being created or updated does not already exist
+   * with the same name, type, and scope (personal or group).
+   *
+   * @param isDuplicate True if a duplicate category already exists.
+   * @throws ResourceAlreadyExistsException if category duplication is detected.
+   */
   private void validateDuplicateCategory(boolean isDuplicate){
     if (isDuplicate) {
       throw new ResourceAlreadyExistsException(CategoryResponseMessage.CATEGORY_ALREADY_EXISTS.getMessage());
     }
   }
 
+  /**
+   * Validates if a category can be safely deleted based on ownership,
+   * system restrictions, and transaction usage.
+   * <p>
+   * Blocks deletion of:
+   * <ul>
+   *   <li>System-defined default categories</li>
+   *   <li>Categories owned by another user</li>
+   *   <li>Categories already used in transactions</li>
+   * </ul>
+   *
+   * @param category The category to be deleted.
+   * @param userId   ID of the user performing the deletion.
+   * @throws DeletionFailedException if deletion is restricted or category is in use.
+   */
   private void validateDeletable(Category category, Long userId) {
     // Block deletion of default system categories
     if (category.getAppUser() == null && category.getExpenseGroup() == null) {
@@ -233,6 +312,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
   }
 
+  /**
+   * Validates whether the requesting user is allowed to update the given category
+   *
+   * @param category The category being updated.
+   * @param userId   ID of the user attempting the update.
+   * @throws UpdationFailedException if the user is not the owner or category is not user-specific.
+   */
   private void validateUpdatePermissions(Category category, Long userId) {
     if (category.getAppUser() == null) {
       throw new UpdationFailedException(CategoryResponseMessage.CATEGORY_UPDATE_RESTRICTED.getMessage());
@@ -243,6 +329,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
   }
 
+  /**
+   * Ensures that a category's type (EXPENSE or INCOME) cannot be changed
+   * if it has already been used in any active transactions.
+   *
+   * @param category The existing category.
+   * @param dto      DTO containing updated category type.
+   * @throws UpdationFailedException if the category type change violates constraints.
+   */
   private void validateCategoryTypeChange(Category category, UpdateCategoryRequestDTO dto) {
     boolean isUsed = userTransactionRepository.existsByCategoryIdAndIsDeletedFalse(category.getId());
     if (isUsed && category.getCategoryType() != dto.getCategoryType()) {
@@ -250,16 +344,39 @@ public class CategoryServiceImpl implements CategoryService {
     }
   }
 
+  /**
+   * Fetches a user entity by ID, throwing a {@link ResourceNotFoundException}
+   * if the user does not exist.
+   *
+   * @param id User ID to fetch.
+   * @return The {@link AppUser} entity.
+   * @throws ResourceNotFoundException if the user is not found.
+   */
   private AppUser findUserOrThrow(Long id) {
     return appUserRepository.findById(id)
                             .orElseThrow(() -> new ResourceNotFoundException(AppUserResponseMessage.USER_NOT_FOUND.getMessage()));
   }
 
+  /**
+   * Fetches a category entity by ID, throwing a {@link ResourceNotFoundException}
+   * if the category does not exist.
+   *
+   * @param categoryId ID of the category to fetch.
+   * @return The {@link Category} entity.
+   * @throws ResourceNotFoundException if the category is not found.
+   */
   private Category findCategoryOrThrow(Long categoryId){
     return categoryRepository.findById(categoryId)
                              .orElseThrow(() -> new ResourceNotFoundException((CategoryResponseMessage.CATEGORY_NOT_FOUND.getMessage())));
   }
 
+  /**
+   * Converts a {@link Category} entity to a simplified {@link CategoryResponseDTO}
+   * for use in API responses.
+   *
+   * @param category The category entity to convert.
+   * @return DTO representation of the category.
+   */
   private CategoryResponseDTO mapToDTO(Category category) {
     return CategoryResponseDTO.builder()
                               .id(category.getId())
@@ -271,6 +388,16 @@ public class CategoryServiceImpl implements CategoryService {
                               .build();
   }
 
+  /**
+   * Builds a comprehensive {@link CategoryDetailResponseDTO} object containing
+   * category metadata and its related transactions and budgets.
+   *
+   * @param category          The category entity.
+   * @param userTransactions  List of personal transactions linked to the category.
+   * @param groupTransactions List of group transactions linked to the category.
+   * @param budgets           List of budgets assigned to the category.
+   * @return A fully populated category detail DTO.
+   */
   private CategoryDetailResponseDTO mapToCategoryDetailDTO(Category category,
                                                            List<UserTransaction> userTransactions,
                                                            List<GroupTransaction> groupTransactions,
@@ -286,6 +413,13 @@ public class CategoryServiceImpl implements CategoryService {
     );
   }
 
+  /**
+   * Converts a {@link UserTransaction} entity into a lightweight DTO
+   * representation for use in category detail responses.
+   *
+   * @param tx The user transaction entity.
+   * @return {@link UserTransactionResponseDTO} containing transaction info.
+   */
   private UserTransactionResponseDTO mapToUserTransactionDTO(UserTransaction tx) {
     return UserTransactionResponseDTO.builder()
                                      .id(tx.getId())
@@ -300,6 +434,13 @@ public class CategoryServiceImpl implements CategoryService {
                                      .build();
   }
 
+  /**
+   * Converts a {@link Budget} entity into a {@link CategoryBudgetInfoDTO},
+   * used to represent budget details linked to a category.
+   *
+   * @param budget The budget entity.
+   * @return DTO containing budget summary information.
+   */
   private CategoryBudgetInfoDTO mapToBudgetDTO(Budget budget) {
     return new CategoryBudgetInfoDTO(
       budget.getId(),
@@ -310,6 +451,13 @@ public class CategoryServiceImpl implements CategoryService {
     );
   }
 
+  /**
+   * Converts a {@link GroupTransaction} entity into a {@link GroupTransactionDTO}
+   * for inclusion in category detail responses.
+   *
+   * @param transaction The group transaction entity.
+   * @return DTO containing summarized transaction details.
+   */
   private GroupTransactionDTO mapToGroupTransactionDTO(GroupTransaction transaction) {
     return new GroupTransactionDTO(
       transaction.getId(),
