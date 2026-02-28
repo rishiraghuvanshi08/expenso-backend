@@ -12,87 +12,86 @@ import java.lang.IllegalArgumentException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * Global exception handler for Expenso application.
+ *
+ * Centralizes exception handling across all controllers,
+ * ensuring uniform response structure and HTTP status mapping.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(EmailAlreadyExistsException.class)
-  public ResponseEntity<CustomResponseMessage> handleEmailExists(EmailAlreadyExistsException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  private ResponseEntity<CustomResponseMessage> buildResponse(HttpStatus status, Exception ex) {
+    return ResponseEntity.status(status).body(new CustomResponseMessage(false, ex.getMessage()));
   }
 
+  /** Handles email duplication errors. */
+  @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<CustomResponseMessage> handleEmailExists(EmailAlreadyExistsException ex) {
+      return buildResponse(HttpStatus.CONFLICT, ex);
+  }
+
+  /** Handles invalid OTP scenarios. */
   @ExceptionHandler(InvalidOtpException.class)
   public ResponseEntity<CustomResponseMessage> handleInvalidOtp(InvalidOtpException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+    return buildResponse(HttpStatus.BAD_REQUEST, ex);
   }
 
+  /** Handles disabled user access attempts. */
   @ExceptionHandler(UserDisabledException.class)
   public ResponseEntity<CustomResponseMessage> handleUserDisabled(UserDisabledException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+    return buildResponse(HttpStatus.BAD_REQUEST, ex);
   }
 
+  /** Handles already deactivated user scenarios. */
   @ExceptionHandler(UserAlreadyDeactivatedException.class)
-  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(UserAlreadyDeactivatedException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDeactivated(UserAlreadyDeactivatedException ex) {
+    return buildResponse(HttpStatus.CONFLICT, ex);
   }
 
+  /** Handles forbidden access errors. */
   @ExceptionHandler(AccessDeniedException.class)
-  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(AccessDeniedException ex) {
-    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  public ResponseEntity<CustomResponseMessage> handleAccessDenied(AccessDeniedException ex) {
+    return buildResponse(HttpStatus.FORBIDDEN, ex);
   }
 
+  /** Handles deletion failure cases. */
   @ExceptionHandler(DeletionFailedException.class)
-  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(DeletionFailedException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  public ResponseEntity<CustomResponseMessage> handleDeletionFailed(DeletionFailedException ex) {
+    return buildResponse(HttpStatus.BAD_REQUEST, ex);
   }
 
+  /** Handles invalid combination scenarios. */
   @ExceptionHandler(InvalidCombinationException.class)
-  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(InvalidCombinationException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  public ResponseEntity<CustomResponseMessage> handleInvalidCombination(InvalidCombinationException ex) {
+    return buildResponse(HttpStatus.CONFLICT, ex);
   }
 
-  @ExceptionHandler(UpdationFailedException.class)
-  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(UpdationFailedException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
-  }
-
+  /** Handles resource already exists errors. */
   @ExceptionHandler(ResourceAlreadyExistsException.class)
-  public ResponseEntity<CustomResponseMessage> handleUserAlreadyDisabled(ResourceAlreadyExistsException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  public ResponseEntity<CustomResponseMessage> handleResourceExists(ResourceAlreadyExistsException ex) {
+    return buildResponse(HttpStatus.CONFLICT, ex);
   }
 
+  /** Handles resource not found errors. */
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<CustomResponseMessage> handleResourceNotFound(ResourceNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+    return buildResponse(HttpStatus.NOT_FOUND, ex);
   }
 
+  /** Handles invalid request errors. */
   @ExceptionHandler(InvalidRequestException.class)
   public ResponseEntity<CustomResponseMessage> handleInvalidRequest(InvalidRequestException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+    return buildResponse(HttpStatus.BAD_REQUEST, ex);
   }
 
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<CustomResponseMessage> handleInvalidRequest(IllegalArgumentException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
+  /** Handles illegal argument or state errors. */
+  @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
+  public ResponseEntity<CustomResponseMessage> handleIllegalExceptions(RuntimeException ex) {
+    return buildResponse(HttpStatus.CONFLICT, ex);
   }
 
-  @ExceptionHandler(IllegalStateException.class)
-  public ResponseEntity<CustomResponseMessage> handleInvalidRequest(IllegalStateException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-                         .body(new CustomResponseMessage(false, ex.getMessage()));
-  }
-
+  /** Handles all unexpected runtime exceptions. */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<CustomResponseMessage> handleGenericException(Exception ex) {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
